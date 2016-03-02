@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/david/programming/notpong/core/build/libs/core-1.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="fc3016f829caee17a09881cf50fcb25ca5c9ebde">
+        <dex dex="/home/david/programming/notpong/android/build/intermediates/pre-dexed/debug/core-1.0_6b8b86f4813abe14d6171fc0314629b18391763f.jar" />
+    </item>
+
+</items>
