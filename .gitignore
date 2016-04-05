@@ -2,7 +2,7 @@
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries
-/build
+build/
 /.idea/workspace.xml
 /.idea/libraries
 /.idea/tasks.xml

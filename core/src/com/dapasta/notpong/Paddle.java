@@ -83,7 +83,7 @@ public class Paddle {
                     //Accelerate to mouse/finger
                     rect.setCenter(center.x, center.y + (dY * SPEED * delta));
 
-                }
+                }git add -A
                 app.socket.emit("updatePaddle", yInput * 100 / Gdx.graphics.getHeight());
             }
         }
