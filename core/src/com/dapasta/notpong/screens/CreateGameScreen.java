@@ -6,17 +6,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dapasta.notpong.Application;
-import com.github.nkzawa.emitter.Emitter;
-
-import org.json.JSONException;
+import com.dapasta.notpong.packets.client.CreateGameRequest;
+import com.dapasta.notpong.packets.server.CreateGameResponse;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import org.json.JSONObject;
 
 public class CreateGameScreen implements Screen {
@@ -32,6 +29,8 @@ public class CreateGameScreen implements Screen {
     private TextButton createButton;
     private TextButton backButton;
 
+    private Listener gameCreatedListener;
+
     public CreateGameScreen(Application app) {
         this.app = app;
 
@@ -45,18 +44,20 @@ public class CreateGameScreen implements Screen {
 
         initUI();
 
-        app.socket.on("gameCreated", new Emitter.Listener() {
+        gameCreatedListener = new Listener() {
             @Override
-            public void call(Object... args) {
-                try {
-                    JSONObject gameObject = new JSONObject(args[0].toString());
-                    app.gameScreen.createGame(gameObject.getInt("gameId"), gameObject.getString("userId"), gameObject.getInt("size"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            public void received(Connection connection, Object object) {
+                super.received(connection, object);
+                if (object instanceof CreateGameResponse) {
+                    CreateGameResponse response = (CreateGameResponse) object;
+
+                    app.sessionId = response.sessionId;
+                    app.gameScreen.createGame(0, 0);
+                    app.setScreen(app.gameScreen);
                 }
-                app.setScreen(app.gameScreen);
             }
-        });
+        };
+        app.network.addListener(gameCreatedListener);
     }
 
     private void initUI() {
@@ -104,7 +105,11 @@ public class CreateGameScreen implements Screen {
         gameData.put("name", nameField.getText());
         gameData.put("size", sizeBox.getSelected());
 
-        app.socket.emit("createGame", gameData);
+        CreateGameRequest request = new CreateGameRequest();
+        request.gameName = nameField.getText();
+        request.gameSize = sizeBox.getSelected();
+        request.creatorName = "DaPasta";
+        app.network.sendTcpPacket(request);
     }
 
     @Override
@@ -138,7 +143,7 @@ public class CreateGameScreen implements Screen {
 
     @Override
     public void hide() {
-        app.socket.off("gameCreated");
+        app.network.removeListener(gameCreatedListener);
     }
 
     @Override

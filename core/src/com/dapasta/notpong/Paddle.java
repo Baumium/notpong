@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.dapasta.notpong.packets.client.MovementRequest;
 
 public class Paddle {
     private Side side;
@@ -75,16 +76,23 @@ public class Paddle {
                 Vector2 center = new Vector2();
                 center = rect.getCenter(center);
 
-                //Check if paddle goes out of bounds
-                if ((yInput > center.y && rect.getY() + rect.getHeight() < Gdx.graphics.getHeight())
-                        || (yInput < center.y && rect.getY() > 0)) {
-                    float dY = yInput - center.y;
+//                //Check if paddle goes out of bounds
+//                if ((yInput > center.y && rect.getY() + rect.getHeight() < Gdx.graphics.getHeight())
+//                        || (yInput < center.y && rect.getY() > 0)) {
+//                    float dY = yInput - center.y;
+//
+//                    //Accelerate to mouse/finger
+//                    rect.setCenter(center.x, center.y + (dY * SPEED * delta));
+//
+//                }
 
-                    //Accelerate to mouse/finger
-                    rect.setCenter(center.x, center.y + (dY * SPEED * delta));
 
-                }git add -A
-                app.socket.emit("updatePaddle", yInput * 100 / Gdx.graphics.getHeight());
+                MovementRequest request = new MovementRequest();
+                request.dx = yInput - center.y;
+                request.playerId = app.network.getId();
+                request.sessionId = app.sessionId;
+
+                app.network.sendTcpPacket(request);
             }
         }
     }

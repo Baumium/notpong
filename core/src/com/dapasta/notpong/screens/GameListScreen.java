@@ -7,20 +7,15 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dapasta.notpong.Application;
 import com.dapasta.notpong.Game;
-import com.github.nkzawa.emitter.Emitter;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.dapasta.notpong.packets.client.GamesRequest;
+import com.dapasta.notpong.packets.server.GamesResponse;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +23,8 @@ import java.util.List;
 public class GameListScreen implements Screen {
 
     private Application app;
+
+    private Listener gameListListener;
 
     private Stage stage;
     private Skin skin;
@@ -56,50 +53,44 @@ public class GameListScreen implements Screen {
         initUI();
 
         //Network related stuff
-        app.socket.connect();
-        app.socket.on("getGames", new Emitter.Listener() {
+        gameListListener = new Listener() {
             @Override
-            public void call(Object... args) {
-                try {
-                    JSONArray gamesArray = new JSONArray(args[0].toString());
-                    games = new ArrayList<Game>();
-                    for (int i = 0; i < gamesArray.length(); i++) {
-                        JSONObject gameObject = gamesArray.getJSONObject(i);
-
-                        Game game = new Game(gameObject.getInt("id"),
-                                gameObject.getString("creator"),
-                                gameObject.getInt("size"));
+            public void received(Connection connection, Object object) {
+                super.received(connection, object);
+                if (object instanceof GamesResponse) {
+                    GamesResponse response = (GamesResponse) object;
+                    for (com.dapasta.notpong.packets.server.Game responseGame : response.games) {
+                        Game game = new Game(1, responseGame.creator, responseGame.size);
                         games.add(game);
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return;
-                }
 
-                gameTable.clearChildren();
-                for (final Game game : games) {
-                    Label size = new Label(game.getSize() + "", skin);
-                    Label creator = new Label(game.getCreator(), skin);
-                    TextButton joinButton = new TextButton("Join", skin);
-                    joinButton.addListener(new ClickListener() {
-                        @Override
-                        public void clicked(InputEvent event, float x, float y) {
-                            app.socket.on("joinedGame", new Emitter.Listener() {
-                                @Override
-                                public void call(Object... args) {
-                                    System.out.println(args[0]);
-                                }
-                            });
-                            app.socket.emit("joinGame", game.getId());
-                        }
-                    });
+                    gameTable.clearChildren();
+                    for (final Game game : games) {
+                        Label size = new Label(game.getSize() + "", skin);
+                        Label creator = new Label(game.getCreator(), skin);
+                        TextButton joinButton = new TextButton("Join", skin);
+                        joinButton.addListener(new ClickListener() {
+                            @Override
+                            public void clicked(InputEvent event, float x, float y) {
+//                                app.socket.on("joinedGame", new Emitter.Listener() {
+//                                    @Override
+//                                    public void call(Object... args) {
+//                                        System.out.println(args[0]);
+//                                    }
+//                                });
+//                                app.socket.emit("joinGame", game.getId());
+                            }
+                        });
 
-                    gameTable.add(size);
-                    gameTable.add(creator);
-                    gameTable.row();
+                        gameTable.add(size);
+                        gameTable.add(creator);
+                        gameTable.row();
+                    }
                 }
             }
-        });
+        };
+        app.network.addListener(gameListListener);
+
         getGames();
     }
 
@@ -145,7 +136,8 @@ public class GameListScreen implements Screen {
     }
 
     private void getGames() {
-        app.socket.emit("getGames");
+        GamesRequest request = new GamesRequest();
+        app.network.sendTcpPacket(request);
     }
 
     @Override
@@ -164,14 +156,6 @@ public class GameListScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             getGames();
         }
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-            createGame();
-        }
-    }
-
-    private void createGame() {
-        app.socket.emit("createGame");
     }
 
     @Override
@@ -191,7 +175,7 @@ public class GameListScreen implements Screen {
 
     @Override
     public void hide() {
-        app.socket.off("getGames");
+        app.network.removeListener(gameListListener);
     }
 
     @Override

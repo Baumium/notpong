@@ -10,14 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.dapasta.notpong.screens.CreateGameScreen;
+import com.dapasta.notpong.screens.GameListScreen;
 import com.dapasta.notpong.screens.GameScreen;
 import com.dapasta.notpong.screens.LoadingScreen;
 import com.dapasta.notpong.screens.MainMenuScreen;
-import com.dapasta.notpong.screens.GameListScreen;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
-import java.net.URISyntaxException;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 
 public class Application extends com.badlogic.gdx.Game {
     public static final int SCREEN_WIDTH = 800;
@@ -30,21 +28,15 @@ public class Application extends com.badlogic.gdx.Game {
     public BitmapFont font30;
     public AssetManager assets;
 
+    public Network network;
+    public String sessionId;
+
     //Screens
     public LoadingScreen loadingScreen;
     public MainMenuScreen mainMenuScreen;
     public GameListScreen gameListScreen;
     public CreateGameScreen createGameScreen;
     public GameScreen gameScreen;
-
-    public Socket socket;
-    {
-        try {
-            socket = IO.socket("http://50.1.179.232:8080");
-        } catch(URISyntaxException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
 	public void create () {
@@ -56,6 +48,9 @@ public class Application extends com.badlogic.gdx.Game {
         initFonts();
 
         assets = new AssetManager();
+
+        network = new Network(5000, "127.0.0.1", 54555, 54777);
+        network.connect();
 
         loadingScreen = new LoadingScreen(this);
         mainMenuScreen = new MainMenuScreen(this);
@@ -96,8 +91,5 @@ public class Application extends com.badlogic.gdx.Game {
         gameScreen.dispose();
         assets.dispose();
 //        font30.dispose(); Commented because it is disposed when stages in other screens are disposed
-
-        socket.off();
-        socket.disconnect();
     }
 }
