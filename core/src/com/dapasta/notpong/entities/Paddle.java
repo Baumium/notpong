@@ -1,4 +1,4 @@
-package com.dapasta.notpong;
+package com.dapasta.notpong.entities;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -6,21 +6,24 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.dapasta.notpong.Side;
 import com.dapasta.notpong.packets.client.MovementRequest;
+import com.dapasta.notpong.packets.server.MovementResponse;
+
+import java.util.HashMap;
 
 public class Paddle {
     private Side side;
-    private boolean userControlled;
 
-    private Rectangle rect;
+    protected Rectangle rect;
     private static final float RELATIVE_WIDTH = 0.01f;
     private static final float RELATIVE_HEIGHT = 0.175f;
 
-    private static final float SPEED = 4f;
+    protected static final float SPEED = 4f;
 
-    public Paddle(Side side, boolean userControlled) {
+
+    public Paddle(Side side) {
         this.side = side;
-        this.userControlled = userControlled;
 
         //Calculate size of paddle
         float xPos;
@@ -67,39 +70,12 @@ public class Paddle {
     }
 
     public void update(float delta, com.dapasta.notpong.Application app) {
-        if (userControlled) {
-            //Make sure screen is touched when on mobile
-            if((Gdx.app.getType() == Application.ApplicationType.Android && Gdx.input.isTouched())
-                    || Gdx.app.getType() != Application.ApplicationType.Android) {
 
-                float yInput = Gdx.graphics.getHeight() - Gdx.input.getY();
-                Vector2 center = new Vector2();
-                center = rect.getCenter(center);
-
-//                //Check if paddle goes out of bounds
-//                if ((yInput > center.y && rect.getY() + rect.getHeight() < Gdx.graphics.getHeight())
-//                        || (yInput < center.y && rect.getY() > 0)) {
-//                    float dY = yInput - center.y;
-//
-//                    //Accelerate to mouse/finger
-//                    rect.setCenter(center.x, center.y + (dY * SPEED * delta));
-//
-//                }
-
-
-                MovementRequest request = new MovementRequest();
-                request.dx = yInput - center.y;
-                request.playerId = app.network.getId();
-                request.sessionId = app.sessionId;
-
-                app.network.sendTcpPacket(request);
-            }
-        }
     }
 
-    public void setPosition(float pos) {
+    public void setPosition(float x) {
         Vector2 center = new Vector2();
         center = rect.getCenter(center);
-        rect.setCenter(center.x, pos);
+        rect.setCenter(center.x, x);
     }
 }

@@ -80,7 +80,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile 'com.esotericsoftware:kryonet:2.22.0-RC1'
         compile 'org.json:json:20160212'
-        compile files("../../notpong-packets/out/artifacts/notpong_packets_jar/notpong-packets.jar")
+        compile files("../../notpong-packets/build/classes/artifacts/com_dapasta_notpong_packets_jar/com.dapasta.notpong.packets.jar")
     }
 }
 

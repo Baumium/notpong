@@ -6,12 +6,6 @@
         <option name="GRADLE_PROJECT_PATH" value=":core" />
       </configuration>
     </facet>
-    <facet type="java-gradle" name="Java-Gradle">
-      <configuration>
-        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
-        <option name="BUILDABLE" value="true" />
-      </configuration>
-    </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
@@ -36,7 +30,6 @@
     <orderEntry type="library" exported="" name="jsonbeans-0.7" level="project" />
     <orderEntry type="library" exported="" name="minlog-1.2" level="project" />
     <orderEntry type="library" exported="" name="objenesis-2.1" level="project" />
-    <orderEntry type="library" exported="" name="notpong-packets" level="project" />
-    <orderEntry type="library" exported="" name="core.core-1.0" level="project" />
+    <orderEntry type="library" exported="" name="C__Users_David_programming_notpong_notpong_packets_build_classes_artifacts_com_dapasta_notpong_packets_jar_com_dapasta_notpong_packets_jar" level="project" />
   </component>
 </module>

@@ -5,9 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.dapasta.notpong.Application;
-import com.dapasta.notpong.Paddle;
+import com.dapasta.notpong.entities.ControlledPaddle;
+import com.dapasta.notpong.entities.Paddle;
 import com.dapasta.notpong.Side;
-import com.dapasta.notpong.packets.client.MovementRequest;
 import com.dapasta.notpong.packets.server.MovementResponse;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -39,7 +39,9 @@ public class GameScreen implements Screen {
                 if(object instanceof MovementResponse) {
                     MovementResponse response = (MovementResponse) object;
 
-                    players.get(app.network.getId()).setPosition(((response.x)));
+                    Paddle paddle = players.get(app.network.getId());
+                    paddle.setPosition(((response.x)));
+                    ((ControlledPaddle) paddle).movementReceived(response);
                 }
             }
         };
@@ -49,7 +51,7 @@ public class GameScreen implements Screen {
         this.gameId = gameId;
         this.size = size;
         players = new HashMap<Integer, Paddle>(size);
-        players.put(app.network.getId(), new Paddle(Side.LEFT, true));
+        players.put(app.network.getId(), new ControlledPaddle());
     }
 
     @Override
