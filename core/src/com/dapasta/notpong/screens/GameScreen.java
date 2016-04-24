@@ -9,6 +9,9 @@ import com.dapasta.notpong.entities.ControlledPaddle;
 import com.dapasta.notpong.entities.Paddle;
 import com.dapasta.notpong.Side;
 import com.dapasta.notpong.packets.server.MovementResponse;
+import com.dapasta.notpong.packets.server.PlayerDisconnectBroadcast;
+import com.dapasta.notpong.packets.server.PlayerJoinBroadcast;
+import com.dapasta.notpong.packets.server.PlayerUpdateBroadcast;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -36,12 +39,42 @@ public class GameScreen implements Screen {
             public void received(Connection connection, Object object) {
                 super.received(connection, object);
 
-                if(object instanceof MovementResponse) {
+                if (object instanceof MovementResponse) {
                     MovementResponse response = (MovementResponse) object;
 
                     Paddle paddle = players.get(app.network.getId());
                     paddle.setPosition(((response.x)));
                     ((ControlledPaddle) paddle).movementReceived(response);
+                }  else if (object instanceof PlayerUpdateBroadcast) {
+                    PlayerUpdateBroadcast broadcast = (PlayerUpdateBroadcast) object;
+
+                    players.get(broadcast.id).setPosition(broadcast.x);
+                } else if (object instanceof PlayerJoinBroadcast) {
+                    PlayerJoinBroadcast broadcast = (PlayerJoinBroadcast) object;
+
+                    // Get new player side based on current player size
+                    Side side;
+                    switch (players.size()) {
+                        case 1:
+                            side = Side.RIGHT;
+                            break;
+                        case 2:
+                            side = Side.TOP;
+                            break;
+                        case 3:
+                            side = Side.BOTTOM;
+                            break;
+                        default:
+                            side = null;
+                    }
+
+                    if (side != null) {
+                        Paddle paddle = new Paddle(side);
+                        players.put(broadcast.id, paddle);
+                    }
+                } else if (object instanceof PlayerDisconnectBroadcast) {
+                    PlayerDisconnectBroadcast broadcast = (PlayerDisconnectBroadcast) object;
+                    players.remove(broadcast.id);
                 }
             }
         };
@@ -54,35 +87,37 @@ public class GameScreen implements Screen {
         players.put(app.network.getId(), new ControlledPaddle());
     }
 
+    public void addPlayers(Map<Integer, String> players) {
+        for (Integer id : players.keySet()) {
+            if (id != app.network.getId()) {
+                Side side;
+                switch (this.players.size()) {
+                    case 1:
+                        side = Side.RIGHT;
+                        break;
+                    case 2:
+                        side = Side.TOP;
+                        break;
+                    case 3:
+                        side = Side.BOTTOM;
+                        break;
+                    default:
+                        side = null;
+                }
+
+                if (side != null) {
+                    Paddle paddle = new Paddle(side);
+                    this.players.put(id, paddle);
+                }
+            }
+        }
+    }
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(null);
 
         app.network.addListener(movementListener);
-
-//        app.socket.on("update", new Emitter.Listener() {
-//            @Override
-//            public void call(Object... args) {
-//                try {
-//                    JSONObject gameObject = new JSONObject(args[0].toString());
-//
-//                    JSONObject playersObject = gameObject.getJSONObject("players");
-//                    for (String key : playersObject.keySet()) {
-//                        JSONObject paddleObject = playersObject.getJSONObject(key).getJSONObject("paddle");
-//                        players.get(key).setPosition((float) paddleObject.getDouble("pos") * Gdx.graphics.getHeight() / 100f);
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//        app.socket.on("playerJoined", new Emitter.Listener() {
-//            @Override
-//            public void call(Object... args) {
-//                System.out.println(args[0]);
-//            }
-//        });
     }
 
     @Override
@@ -120,8 +155,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-//        app.socket.off("update");
-//        app.socket.off("playerJoined");
         app.network.removeListener(movementListener);
     }
 

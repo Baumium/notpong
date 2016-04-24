@@ -13,7 +13,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dapasta.notpong.Application;
 import com.dapasta.notpong.Game;
 import com.dapasta.notpong.packets.client.GamesRequest;
+import com.dapasta.notpong.packets.client.JoinGameRequest;
 import com.dapasta.notpong.packets.server.GamesResponse;
+import com.dapasta.notpong.packets.server.JoinGameResponse;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -59,8 +61,10 @@ public class GameListScreen implements Screen {
                 super.received(connection, object);
                 if (object instanceof GamesResponse) {
                     GamesResponse response = (GamesResponse) object;
+
+                    games.clear();
                     for (com.dapasta.notpong.packets.server.Game responseGame : response.games) {
-                        Game game = new Game(1, responseGame.creator, responseGame.size);
+                        Game game = new Game(responseGame.id, responseGame.creator, responseGame.name);
                         games.add(game);
                     }
 
@@ -72,20 +76,24 @@ public class GameListScreen implements Screen {
                         joinButton.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
-//                                app.socket.on("joinedGame", new Emitter.Listener() {
-//                                    @Override
-//                                    public void call(Object... args) {
-//                                        System.out.println(args[0]);
-//                                    }
-//                                });
-//                                app.socket.emit("joinGame", game.getId());
+                                JoinGameRequest request = new JoinGameRequest();
+                                request.sessionId = game.getId();
+                                app.network.sendTcpPacket(request);
                             }
                         });
 
                         gameTable.add(size);
                         gameTable.add(creator);
+                        gameTable.add(joinButton);
                         gameTable.row();
                     }
+                } else if (object instanceof JoinGameResponse) {
+                    JoinGameResponse response = (JoinGameResponse) object;
+
+                    app.sessionId = response.sessionId;
+                    app.gameScreen.createGame(0, 0);
+                    app.gameScreen.addPlayers(response.players);
+                    app.setScreen(app.gameScreen);
                 }
             }
         };

@@ -15,6 +15,7 @@ public class ControlledPaddle extends Paddle {
 
     private int movementCounter;
     private Map<Integer, MovementRequest> movementQueue;
+    private final int MAX_QUEUE_SIZE = 50;
 
     public ControlledPaddle() {
         super(Side.LEFT);
@@ -26,33 +27,36 @@ public class ControlledPaddle extends Paddle {
     public void update(float delta, Application app) {
         super.update(delta, app);
 
-        //Make sure screen is touched when on mobile
-        if ((Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android && Gdx.input.isTouched())
-                || (Gdx.app.getType() != com.badlogic.gdx.Application.ApplicationType.Android) && Gdx.input.isTouched()) {
-            float yInput = Gdx.graphics.getHeight() - Gdx.input.getY();
-            Vector2 center = new Vector2();
-            center = rect.getCenter(center);
+        // Wait for server to catch up
+        if (movementQueue.size() < MAX_QUEUE_SIZE) {
+            //Make sure screen is touched when on mobile
+            if ((Gdx.app.getType() == com.badlogic.gdx.Application.ApplicationType.Android && Gdx.input.isTouched())
+                    || (Gdx.app.getType() != com.badlogic.gdx.Application.ApplicationType.Android) && Gdx.input.isTouched()) {
+                float yInput = Gdx.graphics.getHeight() - Gdx.input.getY();
+                Vector2 center = new Vector2();
+                center = rect.getCenter(center);
 
-            //Check if paddle goes out of bounds
-            if ((yInput > center.y && rect.getY() + rect.getHeight() < Gdx.graphics.getHeight())
-                    || (yInput < center.y && rect.getY() > 0)) {
-                float dY = yInput - center.y;
+                //Check if paddle goes out of bounds
+                if ((yInput > center.y && rect.getY() + rect.getHeight() < Gdx.graphics.getHeight())
+                        || (yInput < center.y && rect.getY() > 0)) {
+                    float dY = yInput - center.y;
 
-                //Accelerate to mouse/finger
-                float pos = center.y + (dY * SPEED * delta);
-                setPosition(pos);
+                    //Accelerate to mouse/finger
+                    float pos = center.y + (dY * SPEED * delta);
+                    setPosition(pos);
 
-                //Create request
-                MovementRequest request = new MovementRequest();
-                request.x = pos;
-                request.playerId = app.network.getId();
-                request.sessionId = app.sessionId;
-                request.id = movementCounter;
+                    //Create request
+                    MovementRequest request = new MovementRequest();
+                    request.x = pos;
+                    request.playerId = app.network.getId();
+                    request.sessionId = app.sessionId;
+                    request.id = movementCounter;
 
-                //Store request for future checking
-                movementQueue.put(movementCounter, request);
-                movementCounter++;
-                app.network.sendTcpPacket(request);
+                    //Store request for future checking
+                    movementQueue.put(movementCounter, request);
+                    movementCounter++;
+                    app.network.sendTcpPacket(request);
+                }
             }
         }
     }

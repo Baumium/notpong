@@ -1,22 +1,27 @@
 package com.dapasta.notpong;
 
 public class Game {
-    private int id;
+    private String id;
     private String creator;
+    private String name;
     private int size;
 
-    public Game(int id, String creator, int size) {
+    public Game(String id, String creator, String name) {
         this.id = id;
         this.creator = creator;
-        this.size = size;
+        this.name = name;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
     public String getCreator() {
         return creator;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getSize() {

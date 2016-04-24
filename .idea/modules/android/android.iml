@@ -78,12 +78,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="kryo-2.24.0" level="project" />
     <orderEntry type="library" exported="" name="gdx-1.9.1" level="project" />
-    <orderEntry type="library" exported="" name="gdx-box2d-1.9.1" level="project" />
     <orderEntry type="library" exported="" name="minlog-1.2" level="project" />
+    <orderEntry type="library" exported="" name="gdx-box2d-1.9.1" level="project" />
     <orderEntry type="library" exported="" name="gdx-freetype-1.9.1" level="project" />
+    <orderEntry type="library" exported="" name="kryonet-2.22.0-RC1" level="project" />
     <orderEntry type="library" exported="" name="jsonbeans-0.7" level="project" />
     <orderEntry type="library" exported="" name="gdx-backend-android-1.9.1" level="project" />
-    <orderEntry type="library" exported="" name="kryonet-2.22.0-RC1" level="project" />
     <orderEntry type="library" exported="" name="objenesis-2.1" level="project" />
     <orderEntry type="module" module-name="core" exported="" />
   </component>

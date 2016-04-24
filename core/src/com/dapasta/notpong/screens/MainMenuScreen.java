@@ -79,7 +79,7 @@ public class MainMenuScreen implements Screen {
 
         container = new Table(skin);
         container.setFillParent(true);
-        container.add("Main Menu");
+        container.add("NotPong");
         container.add(logoImage).prefSize(stage.getHeight() / 10f, stage.getHeight() / 10f);
         container.row();
         container.add(buttonPlay).colspan(2).uniform().fillX().prefSize(buttonWidth, buttonHeight).spaceTop(buttonOffset);
