@@ -67,6 +67,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+        compile files("../../notpong-packets/build/classes/artifacts/com_dapasta_notpong_packets_jar/com.dapasta.notpong.packets.jar")
     }
 }
 

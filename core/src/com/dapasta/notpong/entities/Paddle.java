@@ -1,29 +1,25 @@
 package com.dapasta.notpong.entities;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.dapasta.notpong.Side;
-import com.dapasta.notpong.packets.client.MovementRequest;
-import com.dapasta.notpong.packets.server.MovementResponse;
-
-import java.util.HashMap;
 
 public class Paddle {
     private Side side;
 
     protected Rectangle rect;
-    private static final float RELATIVE_WIDTH = 0.01f;
-    private static final float RELATIVE_HEIGHT = 0.175f;
 
     protected static final float SPEED = 4f;
 
+    protected float scaleFactor;
 
-    public Paddle(Side side) {
+
+    public Paddle(float unscaledWidth, float unscaledHeight, Side side, float scaleFactor) {
         this.side = side;
+        this.scaleFactor = scaleFactor;
 
         //Calculate size of paddle
         float xPos;
@@ -32,26 +28,26 @@ public class Paddle {
         float height;
         switch (side) {
             case LEFT:
-                width = Gdx.graphics.getWidth() * RELATIVE_WIDTH;
-                height = Gdx.graphics.getHeight() * RELATIVE_HEIGHT;
+                width = unscaledWidth * Gdx.graphics.getWidth() * scaleFactor;
+                height = unscaledHeight * Gdx.graphics.getHeight() * scaleFactor;
                 xPos = width;
                 yPos = (Gdx.graphics.getHeight() / 2) - (height / 2);
                 break;
             case RIGHT:
-                width = Gdx.graphics.getWidth() * RELATIVE_WIDTH;
-                height = Gdx.graphics.getHeight() * RELATIVE_HEIGHT;
+                width = unscaledWidth * Gdx.graphics.getWidth() * scaleFactor;
+                height = unscaledHeight * Gdx.graphics.getHeight() * scaleFactor;
                 xPos = Gdx.graphics.getWidth() - (2 * width);
                 yPos = (Gdx.graphics.getHeight() / 2) - (height / 2);
                 break;
             case TOP:
-                width = Gdx.graphics.getWidth() * RELATIVE_WIDTH;
-                height = Gdx.graphics.getHeight() * RELATIVE_HEIGHT;
+                width = unscaledHeight * Gdx.graphics.getHeight() * scaleFactor;
+                height = unscaledWidth * Gdx.graphics.getWidth() * scaleFactor;
                 xPos = (Gdx.graphics.getWidth() / 2) - (width / 2);
                 yPos = Gdx.graphics.getHeight() - height;
                 break;
             case BOTTOM:
-                width = Gdx.graphics.getWidth() * RELATIVE_WIDTH;
-                height = Gdx.graphics.getHeight() * RELATIVE_HEIGHT;
+                width = unscaledHeight * Gdx.graphics.getHeight() * scaleFactor;
+                height = unscaledWidth * Gdx.graphics.getWidth() * scaleFactor;
                 xPos = (Gdx.graphics.getWidth() / 2) - (width / 2);
                 yPos = 0;
                 break;
@@ -77,5 +73,9 @@ public class Paddle {
         Vector2 center = new Vector2();
         center = rect.getCenter(center);
         rect.setCenter(center.x, x);
+    }
+
+    public void setScaledPosition(float x) {
+        setPosition(Gdx.graphics.getHeight() * x * scaleFactor);
     }
 }

@@ -41,7 +41,7 @@ public class Application extends com.badlogic.gdx.Game {
     @Override
 	public void create () {
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 800);
+        camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
 
@@ -49,7 +49,7 @@ public class Application extends com.badlogic.gdx.Game {
 
         assets = new AssetManager();
 
-        network = new Network(5000, "127.0.0.1", 54555, 54777);
+        network = new Network(5000, "192.168.1.132", 54555, 54777);
         network.connect();
 
         loadingScreen = new LoadingScreen(this);

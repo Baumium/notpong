@@ -52,7 +52,7 @@ public class CreateGameScreen implements Screen {
                     CreateGameResponse response = (CreateGameResponse) object;
 
                     app.sessionId = response.sessionId;
-                    app.gameScreen.createGame(0, 0);
+                    app.gameScreen.createGame(response, true);
                     app.setScreen(app.gameScreen);
                 }
             }
@@ -109,6 +109,14 @@ public class CreateGameScreen implements Screen {
         request.gameName = nameField.getText();
         request.gameSize = sizeBox.getSelected();
         request.creatorName = "DaPasta";
+
+        // Temp values
+        request.fieldSize = 100f;
+        request.ballRadius = 100f / 200f;
+        request.ballSpeed = 100f / 200f;
+        request.paddleWidth = 1;
+        request.paddleHeight = 15;
+
         app.network.sendTcpPacket(request);
     }
 

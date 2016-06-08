@@ -91,7 +91,7 @@ public class GameListScreen implements Screen {
                     JoinGameResponse response = (JoinGameResponse) object;
 
                     app.sessionId = response.sessionId;
-                    app.gameScreen.createGame(0, 0);
+                    app.gameScreen.createGame(response, false);
                     app.gameScreen.addPlayers(response.players);
                     app.setScreen(app.gameScreen);
                 }

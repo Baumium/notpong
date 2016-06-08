@@ -86,5 +86,14 @@
     <orderEntry type="library" exported="" name="gdx-backend-android-1.9.1" level="project" />
     <orderEntry type="library" exported="" name="objenesis-2.1" level="project" />
     <orderEntry type="module" module-name="core" exported="" />
+    <orderEntry type="module-library">
+      <library name="com.dapasta.notpong.packets">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../android/libs/com.dapasta.notpong.packets.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

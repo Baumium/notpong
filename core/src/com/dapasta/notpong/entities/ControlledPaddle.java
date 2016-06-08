@@ -17,8 +17,8 @@ public class ControlledPaddle extends Paddle {
     private Map<Integer, MovementRequest> movementQueue;
     private final int MAX_QUEUE_SIZE = 50;
 
-    public ControlledPaddle() {
-        super(Side.LEFT);
+    public ControlledPaddle(float width, float height, float scaleFactor) {
+        super(width, height, Side.LEFT, scaleFactor);
 
         movementCounter = 0;
         movementQueue = new HashMap<Integer, MovementRequest>();
@@ -47,7 +47,7 @@ public class ControlledPaddle extends Paddle {
 
                     //Create request
                     MovementRequest request = new MovementRequest();
-                    request.x = pos;
+                    request.x = pos / Gdx.graphics.getHeight()/ scaleFactor;
                     request.playerId = app.network.getId();
                     request.sessionId = app.sessionId;
                     request.id = movementCounter;
@@ -65,14 +65,16 @@ public class ControlledPaddle extends Paddle {
         super.draw(renderer);
     }
 
-    public void movementReceived(MovementResponse response) {
+    public void movementReceived(MovementResponse response, float fieldSize) {
         //Check stored request against server response
         if(movementQueue.containsKey(response.id)) {
             MovementRequest request = movementQueue.get(response.id);
             if(request.x == response.x) {
                 movementQueue.remove(response.id);
             } else {
-                setPosition(response.x);
+                setScaledPosition(response.x);
+
+                // Remove all movements after desynced movement
                 for(int i = response.id; movementQueue.containsKey(i); i++) {
                     movementQueue.remove(i);
                 }

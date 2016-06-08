@@ -63,6 +63,7 @@ public class Network {
 
         kryo.register(ErrorResponse.class);
 
+        kryo.register(GameInfoPacket.class);
         kryo.register(CreateGameRequest.class);
         kryo.register(CreateGameResponse.class);
         kryo.register(GamesRequest.class);
@@ -76,6 +77,7 @@ public class Network {
         kryo.register(MovementRequest.class);
         kryo.register(MovementResponse.class);
         kryo.register(PlayerUpdateBroadcast.class);
+        kryo.register(BallBroadcast.class);
     }
 
     public void addListener(Listener listener) {
